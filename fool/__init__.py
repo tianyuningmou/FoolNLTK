@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 # -*-coding:utf-8-*-
 
-
-
 import sys
 import logging
 from collections import defaultdict
-
 from fool import lexical
 from fool import dictionary
-from  fool import model
+from fool import model
 
 LEXICAL_ANALYSER = lexical.LexicalAnalyzer()
 _DICTIONARY = dictionary.Dictionary()
@@ -19,24 +16,29 @@ DEFAULT_LOGGER = logging.getLogger(__name__)
 DEFAULT_LOGGER.setLevel(logging.DEBUG)
 DEFAULT_LOGGER.addHandler(__log_console)
 
-__all__= ["load_model", "cut", "pos_cut", "ner", "analysis", "load_userdict", "delete_userdict"]
+__all__ = ["load_model", "cut", "pos_cut", "ner", "analysis", "load_userdict", "delete_userdict"]
+
 
 def load_model(map_file, model_file):
     m = model.Model(map_file=map_file, model_file=model_file)
     return m
 
+
+# 检查输入
 def _check_input(text, ignore=False):
+    # 如果参数为空，返回空列表
     if not text:
         return []
-
+    # 如果传入参数不是列表，把他转成列表
     if not isinstance(text, list):
         text = [text]
-
+    # 迭代，判断输入的是否为空字符串
     null_index = [i for i, t in enumerate(text) if not t]
     if null_index and not ignore:
         raise Exception("null text in input ")
-
+    # 返回列表
     return text
+
 
 def ner(text, ignore=False):
     text = _check_input(text, ignore)
@@ -54,14 +56,16 @@ def analysis(text, ignore=False):
     return res
 
 
+# 分词
 def cut(text, ignore=False):
 
     text = _check_input(text, ignore)
-
+    # 传入text为空
     if not text:
         return [[]]
-
+    # 再次判断text为空，并转成列表
     text = [t for t in text if t]
+    # 开始分词
     all_words = LEXICAL_ANALYSER.cut(text)
     new_words = []
     if _DICTIONARY.sizes != 0:
@@ -109,7 +113,7 @@ def _mearge_user_words(text, seg_results):
     for m in matchs:
         graph[m.start][m.end] = _DICTIONARY.get_weight(m.keyword) * len(m.keyword)
 
-    route = {}
+    route = dict()
     route[text_len] = (0, 0)
 
     for idx in range(text_len - 1, -1, -1):
@@ -128,3 +132,7 @@ def _mearge_user_words(text, seg_results):
         index = ind_y
 
     return words
+
+
+if __name__ == '__main__':
+    cut('你好好玩，没骗你')
