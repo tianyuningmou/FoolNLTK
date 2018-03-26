@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*-coding:utf-8-*-
 
-
-
 import tensorflow as tf
 import numpy as np
 from tensorflow.contrib.crf import viterbi_decode
@@ -22,12 +20,12 @@ def decode(logits, trans, sequence_lengths, tag_num):
     return viterbi_sequences
 
 
-
 def list_to_array(data_list, dtype=np.int32):
     array = np.array(data_list, dtype).reshape(1, len(data_list))
     return array
 
 
+# 加载图
 def load_graph(path):
     with tf.gfile.GFile(path, "rb") as f:
         graph_def = tf.GraphDef()
@@ -41,7 +39,7 @@ class Predictor(object):
     def __init__(self, model_file, char_to_id, id_to_tag):
 
         self.char_to_id = char_to_id
-        self.id_to_tag = {int(k):v for k,v in id_to_tag.items()}
+        self.id_to_tag = {int(k): v for k, v in id_to_tag.items()}
         self.graph = load_graph(model_file)
 
         self.input_x = self.graph.get_tensor_by_name("prefix/char_inputs:0")
