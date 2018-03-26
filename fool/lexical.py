@@ -32,25 +32,33 @@ class LexicalAnalyzer(object):
         self.map_file_path = os.path.join(self.data_path, "map.zip")
 
 
-    def _load_model(self, model_namel, word_map_name, tag_name):
-        seg_model_path = os.path.join(self.data_path, model_namel)
+    def _load_model(self, model_name, word_map_name, tag_name):
+        # 拼接文件路径
+        seg_model_path = os.path.join(self.data_path, model_name)
+        # 加载训练文件
         char_to_id, id_to_seg = _load_map_file(self.map_file_path, word_map_name, tag_name)
         return Predictor(seg_model_path, char_to_id, id_to_seg)
 
+
+    # 加载分词模型
     def _load_seg_model(self):
         self.seg_model = self._load_model("seg.pb", "char_map", "seg_map")
+
 
     def _load_pos_model(self):
         self.pos_model = self._load_model("pos.pb", "word_map", "pos_map")
 
+
     def _load_ner_model(self):
         self.ner_model = self._load_model("ner.pb", "char_map", "ner_map")
+
 
     def pos(self, seg_words_list):
         if not self.pos_model:
             self._load_pos_model()
         pos_labels = self.pos_model.predict(seg_words_list)
         return pos_labels
+
 
     def ner(self, text_list):
         if not self.ner_model:
